@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Motivational Cookie</title>
+    <!-- Add Google Fonts for script font similar to Frank Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Great+Vibes&family=Parisienne&family=Indie+Flower&family=Comic+Neue:wght@400;700&family=Architects+Daughter&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --warm-beige: #f5f0e6;
+            --warm-beige-darker: #ebe3d5;
+            --cookie-color: #f0c675;
+            --accent-color: #d35f5f;
+            --text-color: #5d4037;
+            --heading-font: 'Great Vibes', cursive;
+            --body-font: 'Dancing Script', cursive;
+            --message-font: 'Architects Daughter', cursive;
+        }
+        
+        body {
+            font-family: var(--body-font);
+            background: #f5f0e1;
+            margin: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: var(--text-color);
+        }
+        
+        h1 {
+            font-family: var(--heading-font);
+            color: #3e2723;
+            margin-bottom: 30px;
+            font-size: 3.5rem;
+            font-weight: 400;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            letter-spacing: 1px;
+        }
+        
+        .fortune-cookie-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+            perspective: 1200px;
+            transform-style: preserve-3d;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        .fortune-cookie-container:hover {
+            transform: scale(1.05);
+            animation-play-state: paused;
+        }
+        
+        .fortune-cookie {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transform-origin: center;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+            transform-style: preserve-3d;
+            backface-visibility: hidden;
+        }
+        
+        .fortune-cookie-left {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="cookieGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" stop-color="%23f5d08a"/><stop offset="100%" stop-color="%23e6b94d"/></radialGradient><radialGradient id="cheekGrad" cx="35" cy="55" r="8" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="%23e57373" stop-opacity="0.7"/><stop offset="100%" stop-color="%23e57373" stop-opacity="0"/></radialGradient></defs><path fill="url(%23cookieGrad)" d="M50,20 A30,30 0 0,0 20,50 A30,30 0 0,0 50,80 L50,20 Z" /><circle fill="%23333" cx="35" cy="40" r="3.5" /><circle fill="%23fff" cx="33" cy="38" r="1" /><path d="M30,35 Q35,32 40,35" stroke="%23333" stroke-width="1.5" stroke-linecap="round" fill="none" /><circle fill="url(%23cheekGrad)" cx="35" cy="55" r="8" /></svg>');
+            transform-origin: right center;
+            clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%);
+        }
+        
+        .fortune-cookie-right {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><radialGradient id="cookieGrad" cx="50%" cy="50%" r="50%" fx="50%" fy="50%"><stop offset="0%" stop-color="%23f5d08a"/><stop offset="100%" stop-color="%23e6b94d"/></radialGradient><radialGradient id="cheekGrad" cx="65" cy="55" r="8" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="%23e57373" stop-opacity="0.7"/><stop offset="100%" stop-color="%23e57373" stop-opacity="0"/></radialGradient></defs><path fill="url(%23cookieGrad)" d="M50,20 A30,30 0 0,1 80,50 A30,30 0 0,1 50,80 L50,20 Z" /><circle fill="%23333" cx="65" cy="40" r="3.5" /><circle fill="%23fff" cx="63" cy="38" r="1" /><path d="M60,35 Q65,32 70,35" stroke="%23333" stroke-width="1.5" stroke-linecap="round" fill="none" /><circle fill="url(%23cheekGrad)" cx="65" cy="55" r="8" /></svg>');
+            transform-origin: left center;
+            clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%);
+        }
+        
+        .cookie-pieces {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        
+        .cookie-piece {
+            position: absolute;
+            width: 15px;
+            height: 15px;
+            background-color: var(--cookie-color);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0);
+        }
+        
+        .fortune-paper {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0) translateZ(0);
+            width: 80%;
+            max-width: 300px;
+            background-color: #fffaf0;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+            transition-delay: 0.3s;
+            font-size: 20px;
+            line-height: 1.6;
+            color: var(--text-color);
+            border: 1px solid rgba(0,0,0,0.05);
+            font-family: var(--message-font);
+            letter-spacing: 0.5px;
+        }
+        
+        .cookie-open .fortune-cookie-left {
+            transform: translate3d(-40px, -15px, 10px) rotate3d(0.5, 1, 0.2, -45deg);
+            opacity: 0.95;
+            filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .cookie-open .fortune-cookie-right {
+            transform: translate3d(40px, 15px, 10px) rotate3d(0.5, 1, 0.2, 45deg);
+            opacity: 0.95;
+            filter: drop-shadow(4px 4px 8px rgba(0,0,0,0.2));
+        }
+        
+        .cookie-open .cookie-pieces {
+            opacity: 1;
+        }
+        
+        .cookie-open .fortune-paper {
+            transform: translate(-50%, -50%) scale(1) translateZ(50px);
+            opacity: 1;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+        
+        .reset-button {
+            margin-top: 40px;
+            padding: 12px 25px;
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 18px;
+            font-weight: 500;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            font-family: var(--body-font);
+        }
+        
+        .reset-button:hover {
+            background-color: #c15050;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+        }
+        
+        .reset-button.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .instructions {
+            color: var(--text-color);
+            margin-top: 15px;
+            margin-bottom: 30px;
+            font-size: 20px;
+            opacity: 0.8;
+            font-family: var(--body-font);
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-4px) rotate(1deg); }
+            50% { transform: translateY(-8px) rotate(2deg); }
+            75% { transform: translateY(-4px) rotate(-1deg); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 185, 77, 0.2); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(230, 185, 77, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(230, 185, 77, 0); }
+        }
+        
+        .fortune-cookie-container::before {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 20px;
+            border-radius: 0 0 25px 25px;
+            border: 2px solid #333;
+            border-top: none;
+            top: 110px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
+            background: transparent;
+            pointer-events: none;
+        }
+        
+        .cookie-open .fortune-cookie-container::before {
+            opacity: 0;
+        }
+        
+        .fortune-cookie-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        .fortune-cookie-container .smile-dimple-left {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #333;
+            top: 110px;
+            left: calc(50% - 25px);
+            z-index: 11;
+            pointer-events: none;
+        }
+        
+        .fortune-cookie-container .smile-dimple-right {
+            content: '';
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background-color: #333;
+            top: 110px;
+            left: calc(50% + 21px);
+            z-index: 11;
+            pointer-events: none;
+        }
+        
+        .cookie-open .smile-dimple-left,
+        .cookie-open .smile-dimple-right {
+            opacity: 0;
+        }
+        
+        @keyframes crackPiece {
+            0% { opacity: 0; transform: translate(0, 0) scale(0) rotate(0deg); }
+            20% { opacity: 1; transform: translate(calc(var(--tx) * 0.5), calc(var(--ty) * 0.5)) scale(1) rotate(calc(var(--tr) * 0.5)); }
+            100% { opacity: 0; transform: translate(var(--tx), calc(var(--ty) + 50px)) scale(0.5) rotate(var(--tr)); }
+        }
+    </style>
+</head>
+<body>
+    <h1>Fortunate Cookie</h1>
+    
+    <p class="instructions">Click the cookie</p>
+    
+    <div class="fortune-cookie-container" id="cookie">
+        <div class="fortune-cookie fortune-cookie-left"></div>
+        <div class="fortune-cookie fortune-cookie-right"></div>
+        <div class="cookie-pieces" id="cookie-pieces"></div>
+        <div class="fortune-paper" id="message"></div>
+        <div class="smile-dimple-left"></div>
+        <div class="smile-dimple-right"></div>
+    </div>
+    
+    <button class="reset-button" id="reset-button">Get Another Cookie</button>
+    
+    <script>
+        // Motivational messages
+        const messages = [
+            "Believe in yourself and all that you are. Know that there is something inside you that is greater than any obstacle.",
+            "Your potential is endless. Go do what you were created to do.",
+            "The only way to do great work is to love what you do. If you haven't found it yet, keep looking.",
+            "Success is not final, failure is not fatal: It is the courage to continue that counts.",
+            "The future belongs to those who believe in the beauty of their dreams.",
+            "Don't watch the clock; do what it does. Keep going.",
+            "Believe you can and you're halfway there.",
+            "You are never too old to set another goal or to dream a new dream.",
+            "The only limit to our realization of tomorrow is our doubts of today.",
+            "It always seems impossible until it's done.",
+            "The harder you work for something, the greater you'll feel when you achieve it.",
+            "Your attitude determines your direction.",
+            "Small steps lead to big changes. Keep moving forward.",
+            "Every accomplishment starts with the decision to try.",
+            "The best way to predict the future is to create it.",
+            "You don't have to be great to start, but you have to start to be great.",
+            "When you feel like quitting, remember why you started.",
+            "The only person you should try to be better than is the person you were yesterday.",
+            "Dream big, work hard, stay focused, and surround yourself with good people.",
+            "Your time is limited, don't waste it living someone else's life.",
+            "The secret of getting ahead is getting started.",
+            "Don't limit your challenges, challenge your limits.",
+            "Life is 10% what happens to you and 90% how you react to it.",
+            "Opportunities don't happen. You create them.",
+            "The difference between ordinary and extraordinary is that little extra.",
+            "The only way to do great things is to love what you do.",
+            "If you want to achieve greatness, stop asking for permission.",
+            "The best revenge is massive success.",
+            "Challenges are what make life interesting. Overcoming them is what makes life meaningful.",
+            "If you're going through hell, keep going."
+        ];
+        
+        const cookie = document.getElementById('cookie');
+        const messageElement = document.getElementById('message');
+        const resetButton = document.getElementById('reset-button');
+        const cookiePieces = document.getElementById('cookie-pieces');
+        
+        // Create cookie crumb pieces
+        function createCookiePieces() {
+            cookiePieces.innerHTML = '';
+            const numPieces = 20;
+            
+            for (let i = 0; i < numPieces; i++) {
+                const piece = document.createElement('div');
+                piece.className = 'cookie-piece';
+                
+                // Random position around the center
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 30 + Math.random() * 50;
+                const x = Math.cos(angle) * distance;
+                const y = Math.sin(angle) * distance;
+                
+                // Random size
+                const size = 3 + Math.random() * 8;
+                
+                // Set CSS variables for the animation
+                piece.style.setProperty('--tx', `${x}px`);
+                piece.style.setProperty('--ty', `${y}px`);
+                piece.style.setProperty('--tr', `${Math.random() * 360}deg`);
+                
+                // Position in the center initially
+                piece.style.left = `calc(50% - ${size/2}px)`;
+                piece.style.top = `calc(50% - ${size/2}px)`;
+                piece.style.width = `${size}px`;
+                piece.style.height = `${size}px`;
+                
+                // Slightly randomize the color
+                const hue = Math.random() * 20 - 10; // +/- 10 degrees
+                const lightness = Math.random() * 10 - 5; // +/- 5%
+                piece.style.backgroundColor = `hsl(40, 70%, ${55 + lightness}%)`;
+                
+                // Add to container
+                cookiePieces.appendChild(piece);
+            }
+        }
+        
+        // Animate cookie pieces
+        function animateCookiePieces() {
+            const pieces = document.querySelectorAll('.cookie-piece');
+            pieces.forEach((piece, index) => {
+                // Stagger the animations
+                setTimeout(() => {
+                    piece.style.animation = `crackPiece ${0.8 + Math.random() * 1}s ease-out forwards`;
+                }, index * 30);
+            });
+        }
+        
+        // Function to get a random message
+        function getRandomMessage() {
+            return messages[Math.floor(Math.random() * messages.length)];
+        }
+        
+        // Set initial message and create cookie pieces
+        messageElement.textContent = getRandomMessage();
+        createCookiePieces();
+        
+        // Add click event to cookie
+        cookie.addEventListener('click', function() {
+            if (!cookie.classList.contains('cookie-open')) {
+                // Play cracking sound if available
+                // const crackSound = new Audio('crack.mp3');
+                // crackSound.play();
+                
+                cookie.classList.add('cookie-open');
+                
+                // Animate the cookie pieces
+                animateCookiePieces();
+                
+                // Show reset button after cookie opens
+                setTimeout(() => {
+                    resetButton.classList.add('visible');
+                }, 1200);
+            }
+        });
+        
+        // Add click event to reset button
+        resetButton.addEventListener('click', function() {
+            // Close the cookie
+            cookie.classList.remove('cookie-open');
+            
+            // Hide reset button
+            resetButton.classList.remove('visible');
+            
+            // Reset cookie pieces
+            createCookiePieces();
+            
+            // Change the message
+            setTimeout(() => {
+                messageElement.textContent = getRandomMessage();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
